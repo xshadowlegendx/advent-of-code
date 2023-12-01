@@ -50,8 +50,6 @@ impl Puzzle {
             let head = head.unwrap();
             let tail = tail.unwrap();
 
-            println!("{cal} = {head}{tail}");
-
             answer += i32::from_str_radix(format!("{head}{tail}").as_str(), 10).unwrap();
         }
 
