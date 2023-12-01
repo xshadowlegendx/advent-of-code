@@ -13,5 +13,5 @@ fn main() {
 
     let input0 = include_str!("../../input0.txt");
 
-    day_0::part0::Puzzle::solve(input0);
+    println!("answer: {:?}", day_0::part0::Puzzle::solve(input0));
 }

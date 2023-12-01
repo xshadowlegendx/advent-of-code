@@ -1,4 +1,7 @@
 
+solve day part:
+    cargo run --package {{day}} --bin {{part}}
+
 test:
     cargo nextest run
 
