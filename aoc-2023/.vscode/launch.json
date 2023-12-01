@@ -63,6 +63,43 @@
         {
             "type": "lldb",
             "request": "launch",
+            "name": "Debug executable 'part1'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--bin=part1",
+                    "--package=day-0"
+                ],
+                "filter": {
+                    "name": "part1",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug unit tests in executable 'part1'",
+            "cargo": {
+                "args": [
+                    "test",
+                    "--no-run",
+                    "--bin=part1",
+                    "--package=day-0"
+                ],
+                "filter": {
+                    "name": "part1",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
             "name": "Debug benchmark 'day-0'",
             "cargo": {
                 "args": [
