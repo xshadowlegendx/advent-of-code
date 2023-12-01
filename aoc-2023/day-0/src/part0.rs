@@ -66,7 +66,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_process() -> Result<(), PuzzleError> {
+    fn test_solve() -> Result<(), PuzzleError> {
         let sample_test_case = "1abc2\npqr3stu8vwx\na1b2c3d4e5f\ntreb7uchet";
 
         assert_eq!(Puzzle::solve(sample_test_case), 142);

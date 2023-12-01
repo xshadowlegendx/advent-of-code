@@ -16,7 +16,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_process() -> Result<(), PuzzleError> {
+    fn test_solve() -> Result<(), PuzzleError> {
         Puzzle::solve("");
 
         Ok(())
