@@ -13,5 +13,5 @@ fn main() {
 
     let input0 = include_str!("../../input0.txt");
 
-    {{crate_name}}::part0::Puzzle::solve(input0);
+    println!("answer: {}", {{crate_name}}::part0::Puzzle::solve(input0));
 }

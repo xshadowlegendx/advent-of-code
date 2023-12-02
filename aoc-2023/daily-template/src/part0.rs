@@ -3,7 +3,8 @@ pub struct Puzzle;
 
 impl Puzzle {
     #[tracing::instrument]
-    pub fn solve(input: &str) {
+    pub fn solve(input: &str) -> bool {
+        true
     }
 }
 
@@ -17,7 +18,9 @@ mod tests {
 
     #[test]
     fn test_solve() -> Result<(), PuzzleError> {
-        Puzzle::solve("");
+        let sample_test_case = "";
+
+        assert_eq!(Puzzle::solve(sample_test_case), true);
 
         Ok(())
     }
