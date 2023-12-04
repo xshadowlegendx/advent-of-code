@@ -82,8 +82,6 @@ impl Puzzle {
             *winings_card.get_mut(&card_idx).unwrap() += 1;
         }
 
-        println!("{:?}", winings_card);
-
         winings_card
             .values()
             .fold(0, |acc, val| {
