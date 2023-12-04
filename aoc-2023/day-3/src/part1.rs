@@ -6,8 +6,6 @@ pub struct Puzzle;
 impl Puzzle {
     #[tracing::instrument]
     pub fn solve(input: &str) -> i32 {
-        let mut winings_card = HashMap::new();
-
         let cards = input
             .split('\n')
             .collect::<Vec<&str>>();
@@ -16,12 +14,10 @@ impl Puzzle {
 
         let mut cards_map = HashMap::new();
 
+        let mut answers = 0;
+
         while let Some(card_idx) = cards_to_process.pop_front() {
             let line = cards[card_idx - 1 as usize];
-
-            if !winings_card.contains_key(&card_idx) {
-                winings_card.insert(card_idx, 0);
-            }
 
             let card = cards_map.get(&card_idx);
 
@@ -64,33 +60,27 @@ impl Puzzle {
                     }
                 }
 
-                cards_map.insert(card_idx, (card_id, winners));
+                cards_map.insert(card_idx, (card_id, winners, VecDeque::new()));
             }
 
-            let (card_id, winners) = cards_map.get(&card_idx).unwrap();
+            let (card_id, winners, to_processes) = cards_map.get_mut(&card_idx).unwrap();
 
-            if winners.len() > 0 {
+            if winners.len() > 0 && to_processes.len() < 1 {
                 for idx in 0..((winners.len() + 1) as i32) {
-                    let idx = idx + card_id;
+                    let idx = idx + *card_id;
 
                     if idx != card_idx as i32 {
-                        cards_to_process.push_back(idx as usize);
+                        to_processes.push_back(idx as usize);
                     }
                 }
             }
 
-            *winings_card.get_mut(&card_idx).unwrap() += 1;
+            cards_to_process.append(to_processes);
+
+            answers += 1;
         }
 
-        winings_card
-            .values()
-            .fold(0, |acc, val| {
-                if *val == 0 {
-                    acc + 1
-                } else {
-                    acc + val
-                }
-            })
+        answers
     }
 }
 
