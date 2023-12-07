@@ -153,11 +153,6 @@ impl Puzzle {
             });
         }
 
-        for (kind, hs) in &hands {
-            println!("{:?}", hs);
-            println!("==== {kind} ====");
-        }
-
         hands
             .iter()
             .fold((1, 0), |(outer_idx, outer_sum), (_, hs)| {
