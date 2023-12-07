@@ -23,8 +23,6 @@ impl Puzzle {
 
         let mut hands = BTreeMap::new();
 
-        let mut j_hands = HashMap::new();
-
         input
             .split('\n')
             .for_each(|l| {
@@ -61,7 +59,7 @@ impl Puzzle {
 
                 let j = kinds_classifier.get(&'J');
 
-                let (kind, kind_jed) = match kinds_classifier.len() {
+                let (_, kind_jed) = match kinds_classifier.len() {
                     1 => (6, 6),
                     2 => {
                         let mut val = 5;
@@ -98,6 +96,8 @@ impl Puzzle {
                             if let Some(j_count) = j {
                                 if *j_count == 2 {
                                     (2, 5)
+                                } else if *j_count == 1 {
+                                    (2, 4)
                                 } else {
                                     (2, 3)
                                 }
@@ -114,7 +114,11 @@ impl Puzzle {
                         }
                     },
                     _ => {
-                        (0, 0)
+                        if j.is_some() {
+                            (0, 1)
+                        } else {
+                            (0, 0)
+                        }
                     },
                 };
 
@@ -123,10 +127,6 @@ impl Puzzle {
                 }
 
                 let bid = i32::from_str_radix(bid.as_str(), 10).unwrap();
-
-                if j.is_some() {
-                    j_hands.insert(hand.clone(), (kind, bid, kind_jed));
-                }
 
                 hands
                     .get_mut(&kind_jed)
