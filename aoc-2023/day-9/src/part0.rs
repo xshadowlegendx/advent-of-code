@@ -24,7 +24,10 @@ impl Puzzle {
 
             while col_idx < col_length {
                 if maps[row_idx].as_bytes()[col_idx] == 83 {
-                    visited.insert((row_idx, col_idx), (maps[row_idx].as_bytes()[col_idx] as char, 0));
+                    visited.insert(
+                        (row_idx, col_idx),
+                        (maps[row_idx].as_bytes()[col_idx] as char, 0, (row_idx, col_idx))
+                    );
 
                     travels.push_back((row_idx, col_idx));
 
@@ -57,8 +60,6 @@ impl Puzzle {
             (-1, 0), // up
         ];
 
-        let mut furthest = 0;
-
         let mut loops = HashMap::new();
 
         while let Some((row_idx, col_idx)) = travels.pop_front() {
@@ -73,42 +74,50 @@ impl Puzzle {
 
                 let next_pos_idx = ((row_idx as i32 + r) as usize, (col_idx as i32 + c) as usize);
 
-                let next_pos = visited.get(&next_pos_idx);
+                let m = maps[next_pos_idx.0].as_bytes()[next_pos_idx.1];
 
-                if let Some(next_pos) = next_pos {
-                    let v = visited.get(&(row_idx, col_idx)).unwrap();
-
-                    if v.1 > next_pos.1 {
-                        loops.insert((row_idx, col_idx), *v);
-                    } else {
-                        loops.insert(next_pos_idx, *next_pos);
-                    }
-
+                if m == 46 {
                     continue;
                 }
 
-                let m = maps[next_pos_idx.0].as_bytes()[next_pos_idx.1];
+                let v = visited.get(&(row_idx, col_idx)).unwrap();
+
+                if v.2 == next_pos_idx {
+                    continue;
+                }
 
                 if let Some(mv) = moves.get(&m) {
+                    let mut is_connected = false;
+
                     for (r, c) in mv {
                         if next_pos_idx.0 as i32 + r == row_idx as i32 && next_pos_idx.1 as i32 + c == col_idx as i32 {
-                            let (_, visit_val) = visited.get(&(row_idx, col_idx)).unwrap();
+                            is_connected = true;
+                        }
+                    }
 
-                            if visit_val + 1 > furthest {
-                                furthest = visit_val + 1;
+                    if is_connected {
+                        if let Some(val) = visited.get(&next_pos_idx) {
+                            if val.1 > v.1 {
+                                loops.insert(next_pos_idx, *val);
+                            } else {
+                                loops.insert((row_idx, col_idx), *v);
                             }
 
-                            visited.insert(next_pos_idx, (m as char, visit_val + 1));
-                            travels.push_back(next_pos_idx);
+                            continue;
                         }
+
+                        visited.insert(next_pos_idx, (m as char, v.1 + 1, (row_idx, col_idx)));
+                        travels.push_back(next_pos_idx);
                     }
                 }
             }
         }
 
+        println!("{:?}", loops);
+
         let mut max_steps = 0;
 
-        for (_, (_, steps)) in &loops {
+        for (_, (_, steps, _)) in &loops {
             if *steps > max_steps {
                 max_steps = *steps
             }
@@ -126,7 +135,7 @@ impl Puzzle {
         m.insert('L', '└');
         m.insert('J', '┘');
 
-        for ((r, c), (ch, _)) in visited {
+        for ((r, c), (ch, _, _)) in visited {
             d[r][c] = *m.get(&ch).unwrap();
         }
 
@@ -204,6 +213,14 @@ mod tests {
         ..L--J";
 
         assert_eq!(Puzzle::solve(sample_test_case), 8);
+
+        let sample_test_case = "........\n\
+        F-S-7...\n\
+        |.|.L--7\n\
+        L-J.F--J\n\
+        ....L---";
+
+        assert_eq!(Puzzle::solve(sample_test_case), 4);
 
         let sample_test_case = ".........\n\
         .S------7.\n\
