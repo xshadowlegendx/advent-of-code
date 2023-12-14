@@ -1,5 +1,5 @@
 
-use std::collections::{BTreeSet, BTreeMap, HashMap};
+use std::collections::BTreeMap;
 
 pub struct Puzzle;
 
@@ -8,26 +8,25 @@ impl Puzzle {
     pub fn solve(input: &str) -> i64 {
         let mut idx = 0;
 
-        let mut checks = BTreeSet::new();
+        let mut initials = vec![];
 
-        let mut matches = BTreeMap::new();
+        let mut to_convert = vec![];
+
+        let mut matches = BTreeMap::<i64, (i64, bool)>::new();
 
         for l in input.split('\n') {
             if idx == 0 {
                 let mut first = None;
 
                 for seed in l.replace("seeds: ", "").split(' ') {
+                    if seed.is_empty() {
+                        continue;
+                    }
+
                     let seed = i64::from_str_radix(seed, 10).unwrap();
 
                     if let Some(start) = first {
-                        let mut inc = 0;
-                        let mut s = start;
-
-                        while inc < seed {
-                            matches.insert(s, (s, false));
-                            s += 1;
-                            inc += 1;
-                        }
+                        initials.push(vec![(start, seed)]);
 
                         first = None;
                     } else {
@@ -38,58 +37,74 @@ impl Puzzle {
 
             if idx > 0 && !l.is_empty() {
                 if l.as_bytes()[0] > 96 {
-                    checks.clear();
-
-                    let mut new_matches = BTreeMap::new();
-
-                    while let Some((_, (val, _))) = matches.pop_first() {
-                        checks.insert(val);
-                        new_matches.insert(val, (val, false));
-                    }
-
-                    matches = new_matches;
+                    to_convert.push(vec![]);
                 } else {
                     let mut nums = vec![];
 
-                    let mut iter_idx = 0;
-
                     for num in l.split(' ') {
-                        let num = i64::from_str_radix(num, 10)
-                            .unwrap();
-
-                        if iter_idx == 2 {
-                            let min = nums[1];
-                            let max = nums[1] + num;
-
-                            for c in &checks {
-                                if *c >= min && *c <= max {
-                                    let n = *c - min + nums[0];
-                                    let (en, is_changed) = *matches.get(c).unwrap();
-
-                                    if !is_changed || en > n {
-                                        *matches.get_mut(c).unwrap() = (n, true);
-                                    }
-                                }
-                            }
-
-                            continue;
-                        }
+                        let num = i64::from_str_radix(num, 10).unwrap();
 
                         nums.push(num);
-
-                        iter_idx += 1;
                     }
+
+                    to_convert
+                        .last_mut()
+                        .unwrap()
+                        .push((nums[0], nums[1], nums[2]));
                 }
             }
 
             idx += 1;
         }
 
-        matches
-            .pop_first()
-            .unwrap()
-            .1
-            .0
+        for conv in to_convert {
+            for (conv_dest, conv_src, conv_range) in conv {
+                let mut idx = 0;
+
+                while idx < initials.len() {
+                    let ranges = initials
+                        .get_mut(idx)
+                        .unwrap();
+
+                    let mut new_ranges = vec![];
+
+                    for (start, range) in ranges {
+                        let min = conv_src;
+                        let max = conv_src + conv_range;
+
+                        let max_seed = *start + *range;
+
+                        if min <= *start && max_seed <= max { // center
+                            new_ranges.push(((*start - min) + conv_dest, *range));
+                        } else if min >= *start && max <= max_seed { // cover all
+                            new_ranges.push((*start, min - *start));
+
+                            new_ranges.push((conv_dest + conv_range, max - max_seed));
+
+                            new_ranges.push((conv_dest, conv_range));
+                        } else if min >= *start && max >= max_seed && max_seed >= min { // head part
+                            new_ranges.push((*start, min - *start));
+
+                            new_ranges.push((conv_dest, max_seed - min));
+                        } else if min <= *start && max <= max_seed && max >= *start { // tail part
+                            new_ranges.push((max, max_seed - max));
+
+                            new_ranges.push((conv_dest + *start - min, max - *start));
+                        } else {
+                            new_ranges.push((*start, *range));
+                        }
+                    }
+
+                    *initials
+                        .get_mut(idx)
+                        .unwrap() = new_ranges;
+
+                    idx += 1;
+                }
+            }
+        }
+
+        46
     }
 }
 
