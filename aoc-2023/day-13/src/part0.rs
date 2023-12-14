@@ -24,7 +24,7 @@ impl Puzzle {
                 if map[row_idx].as_bytes()[col_idx] == 79 {
                     let mut go_up_idx = 1;
 
-                    while row_idx as i32  - go_up_idx > -1 {
+                    while row_idx as i32 - go_up_idx > -1 {
                         if map[row_idx - go_up_idx as usize].as_bytes()[col_idx] != 46 {
                             break;
                         }
@@ -54,7 +54,6 @@ impl Puzzle {
                         unsafe {
                             *map
                                 .get_mut(row_idx - go_up_idx as usize + additional_move)
-                                // .get_mut(row_idx - moves + additional_move)
                                 .unwrap()
                                 .as_bytes_mut()
                                 .get_mut(col_idx)
