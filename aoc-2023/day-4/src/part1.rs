@@ -1,5 +1,5 @@
+use std::collections::HashMap;
 
-use std::collections::BTreeMap;
 
 pub struct Puzzle;
 
@@ -11,8 +11,6 @@ impl Puzzle {
         let mut initials = vec![];
 
         let mut to_convert = vec![];
-
-        let mut matches = BTreeMap::<i64, (i64, bool)>::new();
 
         for l in input.split('\n') {
             if idx == 0 {
@@ -58,6 +56,8 @@ impl Puzzle {
         }
 
         for conv in to_convert {
+            let mut is_changed = HashMap::new();
+
             for (conv_dest, conv_src, conv_range) in conv {
                 let mut idx = 0;
 
@@ -68,7 +68,7 @@ impl Puzzle {
 
                     let mut new_ranges = vec![];
 
-                    for (start, range) in ranges {
+                    for (start, range) in ranges.iter() {
                         let min = conv_src;
                         let max = conv_src + conv_range;
 
@@ -79,7 +79,7 @@ impl Puzzle {
                         } else if min >= *start && max <= max_seed { // cover all
                             new_ranges.push((*start, min - *start));
 
-                            new_ranges.push((conv_dest + conv_range, max - max_seed));
+                            new_ranges.push((conv_dest + conv_range, max_seed - max));
 
                             new_ranges.push((conv_dest, conv_range));
                         } else if min >= *start && max >= max_seed && max_seed >= min { // head part
@@ -95,16 +95,58 @@ impl Puzzle {
                         }
                     }
 
-                    *initials
-                        .get_mut(idx)
-                        .unwrap() = new_ranges;
+                    if new_ranges != *ranges {
+                        if !is_changed.contains_key(&idx) {
+                            is_changed.insert(idx, ());
+
+                            *initials
+                                .get_mut(idx)
+                                .unwrap() = new_ranges;    
+                        } else {
+                            let lowest_new_init = new_ranges
+                                .iter()
+                                .fold(i64::MAX, |lowest, (v, _)| {
+                                    if lowest > *v {
+                                        *v
+                                    } else {
+                                        lowest
+                                    }
+                                });
+
+                            let lowest_init = ranges
+                                .iter()
+                                .fold(i64::MAX, |lowest, (v, _)| {
+                                    if lowest > *v {
+                                        *v
+                                    } else {
+                                        lowest
+                                    }
+                                });
+
+                            if lowest_new_init > lowest_init {
+                                // *initials
+                                //     .get_mut(idx)
+                                //     .unwrap() = new_ranges;
+                            }
+                        }
+                    }
 
                     idx += 1;
                 }
             }
         }
 
-        46
+        let mut lowest = i64::MAX;
+
+        for init in initials {
+            for (l, _) in init {
+                if lowest > l {
+                    lowest = l;
+                }
+            }
+        }
+
+        lowest
     }
 }
 
