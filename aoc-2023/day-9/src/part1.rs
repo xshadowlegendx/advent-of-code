@@ -63,7 +63,7 @@ impl Puzzle {
         // let mut loops = HashMap::new();
 
         while let Some((row_idx, col_idx)) = travels.pop_front() {
-            /// debug
+            // debug
 
             // let mut d = vec![vec!['.'; col_length]; row_length];
 
@@ -90,7 +90,7 @@ impl Puzzle {
 
             // println!("========");
 
-            /// debug
+            // debug
 
             let current = maps[row_idx].as_bytes()[col_idx];
 
@@ -192,8 +192,6 @@ impl Puzzle {
                     let mut corner_char = None;
 
                     while c_idx < col_length {
-                        let xx = d[row_idx][c_idx];
-
                         if d[row_idx][c_idx] != '-' && d[row_idx][c_idx] != '.' {
                             if d[row_idx][c_idx] != '|' {
                                 if d[row_idx][c_idx] == '*' {
