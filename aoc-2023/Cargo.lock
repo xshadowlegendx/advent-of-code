@@ -114,6 +114,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "day-14"
+version = "0.1.0"
+dependencies = [
+ "dhat",
+ "tracing",
+ "tracing-subscriber",
+]
+
+[[package]]
 name = "day-2"
 version = "0.1.0"
 dependencies = [
