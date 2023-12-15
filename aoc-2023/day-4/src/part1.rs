@@ -61,6 +61,10 @@ impl Puzzle {
             for (conv_dest, conv_src, conv_range) in conv {
                 let mut idx = 0;
 
+                if conv_dest == 0 {
+                    println!("now zero");
+                }
+
                 while idx < initials.len() {
                     let ranges = initials
                         .get_mut(idx)
@@ -77,19 +81,27 @@ impl Puzzle {
                         if min <= *start && max_seed <= max { // center
                             new_ranges.push(((*start - min) + conv_dest, *range));
                         } else if min >= *start && max <= max_seed { // cover all
-                            new_ranges.push((*start, min - *start));
+                            new_ranges.push((*start, min - *start - 1));
 
-                            new_ranges.push((conv_dest + conv_range, max_seed - max));
+                            new_ranges.push((max + 1, max_seed - max - 1));
 
                             new_ranges.push((conv_dest, conv_range));
                         } else if min >= *start && max >= max_seed && max_seed >= min { // head part
-                            new_ranges.push((*start, min - *start));
+                            new_ranges.push((*start, min - *start - 1));
 
-                            new_ranges.push((conv_dest, max_seed - min));
+                            if max_seed - min == 0 {
+                                new_ranges.push((conv_dest, 1));
+                            } else {
+                                new_ranges.push((conv_dest, max_seed - min));
+                            }
                         } else if min <= *start && max <= max_seed && max >= *start { // tail part
-                            new_ranges.push((max, max_seed - max));
+                            new_ranges.push((max + 1, max_seed - max - 1));
 
-                            new_ranges.push((conv_dest + *start - min, max - *start));
+                            if max - *start == 0 {
+                                new_ranges.push((conv_dest, 1));
+                            } else {
+                                new_ranges.push((conv_dest + *start - min, max_seed - max));
+                            }
                         } else {
                             new_ranges.push((*start, *range));
                         }
@@ -101,7 +113,7 @@ impl Puzzle {
 
                             *initials
                                 .get_mut(idx)
-                                .unwrap() = new_ranges;    
+                                .unwrap() = new_ranges;
                         } else {
                             let lowest_new_init = new_ranges
                                 .iter()
@@ -123,7 +135,8 @@ impl Puzzle {
                                     }
                                 });
 
-                            if lowest_new_init > lowest_init {
+                            if lowest_init > lowest_new_init {
+                                let _ = lowest_init + lowest_new_init;
                                 // *initials
                                 //     .get_mut(idx)
                                 //     .unwrap() = new_ranges;
@@ -138,10 +151,10 @@ impl Puzzle {
 
         let mut lowest = i64::MAX;
 
-        for init in initials {
+        for init in &initials {
             for (l, _) in init {
-                if lowest > l {
-                    lowest = l;
+                if lowest > *l {
+                    lowest = *l;
                 }
             }
         }
