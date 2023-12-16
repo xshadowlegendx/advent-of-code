@@ -1,5 +1,5 @@
 
-use std::collections::{VecDeque, HashMap};
+use std::collections::{VecDeque, HashMap, HashSet};
 
 pub struct Puzzle;
 
@@ -56,9 +56,7 @@ impl Puzzle {
 
         let mut beams = VecDeque::<((i32, i32), (i32, i32))>::from([((0, -1), (0, 1))]);
 
-        let mut prev_energized_length = 0;
-        let mut is_not_moving = false;
-        let mut is_not_moving_count = 0;
+        let mut visited = HashSet::new();
 
         while let Some((current_position, moving_direction)) = beams.pop_front() {
             let next_row = current_position.0 + moving_direction.0;
@@ -68,24 +66,13 @@ impl Puzzle {
                 continue;
             }
 
+            if visited.contains(&((next_row, next_col), moving_direction)) {
+                continue;
+            }
+
+            visited.insert(((next_row, next_col), moving_direction));
+
             energized.insert((next_row, next_col), moving_direction);
-
-            if energized.len() == prev_energized_length {
-                if is_not_moving {
-                    is_not_moving = true;
-                }
-
-                is_not_moving_count += 1;
-            } else {
-                is_not_moving = false;
-                is_not_moving_count = 0;
-            }
-
-            if is_not_moving_count > row_length * col_length * 1024 {
-                break;
-            }
-
-            prev_energized_length = energized.len();
 
             let next_row = next_row as usize;
             let next_col = next_col as usize;
