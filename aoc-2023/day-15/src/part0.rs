@@ -66,18 +66,20 @@ impl Puzzle {
                 continue;
             }
 
-            if visited.contains(&((next_row, next_col), moving_direction)) {
-                continue;
-            }
-
-            visited.insert(((next_row, next_col), moving_direction));
-
             energized.insert((next_row, next_col), moving_direction);
 
             let next_row = next_row as usize;
             let next_col = next_col as usize;
 
             let next_tile = &map[next_row].as_bytes()[next_col];
+
+            if *next_tile == 46 {
+                if visited.contains(&((next_row, next_col), moving_direction)) {
+                    continue;
+                }
+
+                visited.insert(((next_row, next_col), moving_direction));
+            }
 
             // debug
             // let mut r_idx = 0;
