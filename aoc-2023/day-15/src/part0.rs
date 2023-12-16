@@ -8,24 +8,38 @@ impl Puzzle {
     pub fn solve(input: &str) -> usize {
         let mut energized = HashMap::new();
 
-        let mut beam_dir_switches = HashMap::<u8, HashMap<(i32, i32), (i32, i32)>>::new();
+        let mut beam_dir_switches = HashMap::<u8, HashMap<(i32, i32), Vec<(i32, i32)>>>::new();
 
         beam_dir_switches.insert(
             47,
             HashMap::from([
-                ((0, 1), (-1, 0)),
-                ((0, -1), (1, 0)),
-                ((1, 0), (0, -1)),
-                ((-1, 0), (0, 1)),
+                ((0, 1), vec![(-1, 0)]),
+                ((0, -1), vec![(1, 0)]),
+                ((1, 0), vec![(0, -1)]),
+                ((-1, 0), vec![(0, 1)]),
             ])
         );
         beam_dir_switches.insert(
             92,
             HashMap::from([
-                ((0, 1), (1, 0)),
-                ((0, -1), (-1, 0)),
-                ((1, 0), (0, 1)),
-                ((-1, 0), (0, -1)),
+                ((0, 1), vec![(1, 0)]),
+                ((0, -1), vec![(-1, 0)]),
+                ((1, 0), vec![(0, 1)]),
+                ((-1, 0), vec![(0, -1)]),
+            ])
+        );
+        beam_dir_switches.insert(
+            45,
+            HashMap::from([
+                ((1, 0), vec![(0, 1), (0, -1)]),
+                ((-1, 0), vec![(0, 1), (0, -1)]),
+            ])
+        );
+        beam_dir_switches.insert(
+            124,
+            HashMap::from([
+                ((0, 1), vec![(1, 0), (-1, 0)]),
+                ((0, -1), vec![(1, 0), (-1, 0)]),
             ])
         );
 
@@ -106,54 +120,16 @@ impl Puzzle {
             // println!("=======\n\n");
             // debug
 
-            match *next_tile {
-                47 | 92 => {
-                    let moves = beam_dir_switches
-                        .get(next_tile)
-                        .unwrap();
-
-                    let new_dir = moves
-                        .get(&moving_direction)
-                        .unwrap();
-
-                    // println!("{:?}", new_dir);
-                    // println!("==== new dir =====");
-
-                    beams.push_back((
-                        (next_row as i32, next_col as i32),
-                        *new_dir
-                    ));
+            if let Some(moves) = beam_dir_switches.get(next_tile) {
+                if let Some(new_dir) = moves.get(&moving_direction) {
+                    for dir in new_dir {
+                        beams.push_back((
+                            (next_row as i32, next_col as i32),
+                            *dir,
+                        ));
+                    }
                     continue;
-                },
-                45 => {
-                    if moving_direction != (0, 1) && moving_direction != (0, -1) {
-                        beams.push_back((
-                            (next_row as i32, next_col as i32),
-                            (0, 1),
-                        ));
-                        beams.push_back((
-                            (next_row as i32, next_col as i32),
-                            (0, -1),
-                        ));
-
-                        continue;
-                    }
-                },
-                124 => {
-                    if moving_direction != (1, 0) && moving_direction != (-1, 0) {
-                        beams.push_back((
-                            (next_row as i32, next_col as i32),
-                            (1, 0),
-                        ));
-                        beams.push_back((
-                            (next_row as i32, next_col as i32),
-                            (-1, 0),
-                        ));
-
-                        continue;
-                    }
-                },
-                _ => {},
+                }
             }
 
             beams.push_back((
