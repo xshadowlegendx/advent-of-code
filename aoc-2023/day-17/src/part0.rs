@@ -57,7 +57,7 @@ impl Puzzle {
 
             let dir = dir.unwrap();
             let range = range.unwrap();
-            let color = color.unwrap();
+            let _color = color.unwrap();
 
             if previous_move.is_none() {
                 previous_move = Some(dir);
@@ -120,15 +120,19 @@ impl Puzzle {
 
         let mut edges = vec![];
 
+        let mut edges_map = HashMap::new();
+
         for d in &dugged {
             let mut r_idx = d.0.0;
             let mut c_idx = d.0.1;
 
             while (r_idx, c_idx) != d.1 {
-                let map_row = ((max_size / 3) + r_idx) as usize;
-                let map_col = ((max_size / 3) + c_idx) as usize;
+                let map_row = ((max_size / 2) + r_idx) as usize;
+                let map_col = ((max_size / 2) + c_idx) as usize;
 
                 edges.push((map_row, map_col));
+
+                edges_map.insert((map_row, map_col), ());
 
                 map[map_row][map_col] = '#';
 
@@ -141,9 +145,9 @@ impl Puzzle {
 
         let mut dugged_deep = HashMap::new();
 
-        for m in &map {
-            println!("{}", String::from_utf8(m.iter().map(|f| *f as u8).collect()).unwrap());
-        }
+        // for m in &map {
+        //     println!("{}", String::from_utf8(m.iter().map(|f| *f as u8).collect()).unwrap());
+        // }
 
         for edge in edges {
             let mut col_idx = edge.1;
@@ -158,18 +162,28 @@ impl Puzzle {
                     let mut idx = 0;
                     let mut passes = 0;
 
-                    let mut count_idx = 0;
+                    let mut upper_edge_count = 0;
+                    let mut bottom_edge_count = 0;
 
                     while col_idx + idx < max_size as usize {
-                        if map[edge.0][col_idx + idx] == '#' {
-                            if count_idx == 0 {
-                                count_idx = col_idx + idx;
-                                passes += 1;
-                            } else if count_idx == col_idx + idx - 1 {
-                                count_idx = col_idx + idx + 1;
+                        if edges_map.contains_key(&(edge.0, col_idx + idx)) {
+                            if edges_map.contains_key(&(edge.0 + 1, col_idx + idx)) {
+                                upper_edge_count += 1;
                             }
-                        } else if count_idx != 0 && count_idx != col_idx + idx - 1 {
-                            passes += 1;
+
+                            if edges_map.contains_key(&(edge.0 - 1, col_idx + idx)) {
+                                bottom_edge_count += 1;
+                            }
+
+                            if upper_edge_count == 1 && bottom_edge_count == 1 {
+                                passes += 1;
+                                upper_edge_count = 0;
+                                bottom_edge_count = 0;
+                            } else if upper_edge_count == 2 || bottom_edge_count == 2 {
+                                passes += 2;
+                                upper_edge_count = 0;
+                                bottom_edge_count = 0;
+                            }
                         }
 
                         idx += 1;
@@ -189,9 +203,9 @@ impl Puzzle {
             }
         }
 
-        for m in &map {
-            println!("{}", String::from_utf8(m.iter().map(|f| *f as u8).collect()).unwrap());
-        }
+        // for m in &map {
+        //     println!("{}", String::from_utf8(m.iter().map(|f| *f as u8).collect()).unwrap());
+        // }
 
         dugged_position.len() + dugged_deep.len()
     }
