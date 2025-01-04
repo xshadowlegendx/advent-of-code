@@ -12,8 +12,6 @@ func SolutionPart0(input string) int {
 	left := []int{}
 	right := []int{}
 
-	input = strings.ReplaceAll(input, "\t", "")
-
 	for _, s := range strings.Split(input, "\n") {
 		ss := strings.Split(s, "   ")
 
