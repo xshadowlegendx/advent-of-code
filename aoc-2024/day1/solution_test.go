@@ -15,7 +15,7 @@ func Test_Solution(t *testing.T) {
 		isTolerateBadLevel bool
 	}{
 		{
-			name:               "example",
+			name:               "example part0",
 			want:               2,
 			isTolerateBadLevel: false,
 			input: `7 6 4 2 1
@@ -26,7 +26,7 @@ func Test_Solution(t *testing.T) {
 					1 3 6 7 9`,
 		},
 		{
-			name:               "example",
+			name:               "example part1",
 			want:               4,
 			isTolerateBadLevel: true,
 			input: `7 6 4 2 1
